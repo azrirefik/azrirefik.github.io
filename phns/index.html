@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f4f1ea" />
+  <title>PHNS Scheduler</title>
+  <style>
+    :root {
+      --bg: #f4f1ea;
+      --paper: #fffcf7;
+      --ink: #1a1a1a;
+      --muted: #6b6560;
+      --line: #ddd6cb;
+      --accent: #0f5c4c;
+      --accent-soft: #e4f0ec;
+      --danger: #9b2c2c;
+      --warn: #8a5a00;
+      --hit: #0f5c4c;
+      --shadow: 0 1px 0 rgba(26, 26, 26, 0.04);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.45;
+      padding: 14px 14px 96px;
+      max-width: 480px;
+      margin-inline: auto;
+      -webkit-font-smoothing: antialiased;
+    }
+    header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--line);
+    }
+    header h1 {
+      font-size: 1.05rem;
+      font-weight: 650;
+      letter-spacing: -0.02em;
+      margin: 0;
+    }
+    header .sub {
+      color: var(--muted);
+      font-size: 0.75rem;
+      margin: 0;
+      white-space: nowrap;
+    }
+    #sync-status {
+      font-size: 0.7rem;
+      color: var(--muted);
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+    #sync-status.ok { color: var(--accent); }
+    #sync-status.err { color: var(--danger); }
+    nav.tabs {
+      display: flex;
+      gap: 2px;
+      margin-bottom: 16px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 0;
+    }
+    nav.tabs button {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 10px 12px 11px;
+      cursor: pointer;
+      white-space: nowrap;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+    nav.tabs button.active {
+      color: var(--ink);
+      border-bottom-color: var(--accent);
+      font-weight: 600;
+    }
+    h2 {
+      font-size: 0.8rem;
+      font-weight: 650;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 0 0 10px;
+    }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .row > * { flex: 1 1 130px; }
+    label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 0 0 5px;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 11px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: var(--paper);
+      color: var(--ink);
+      font: inherit;
+      font-size: 1rem;
+      box-shadow: var(--shadow);
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+    }
+    textarea { min-height: 72px; resize: vertical; }
+    .filters { margin-bottom: 12px; }
+    .btn {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: var(--paper);
+      color: var(--ink);
+      border-radius: 8px;
+      padding: 11px 14px;
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 550;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+    }
+    .btn:active { transform: translateY(1px); }
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .btn-danger {
+      border-color: #e8c4c4;
+      color: var(--danger);
+      background: #fdf6f6;
+    }
+    .btn-ghost {
+      background: transparent;
+      box-shadow: none;
+    }
+    .btn-block { width: 100%; margin-top: 8px; }
+    .btn-sm {
+      padding: 7px 10px;
+      font-size: 0.8rem;
+    }
+    .card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px 13px;
+      margin-bottom: 8px;
+      box-shadow: var(--shadow);
+    }
+    .card .meta {
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .card .title {
+      font-weight: 600;
+      margin: 3px 0 0;
+      letter-spacing: -0.01em;
+    }
+    .card .actions { display: flex; gap: 8px; margin-top: 10px; }
+    .empty {
+      color: var(--muted);
+      padding: 28px 12px;
+      text-align: center;
+      font-size: 0.92rem;
+    }
+    .tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 650;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 3px 7px;
+      border-radius: 4px;
+      background: #eeeae2;
+      color: var(--muted);
+    }
+    .tag.hit { background: var(--accent-soft); color: var(--hit); }
+    .tag.near { background: #f7efd9; color: var(--warn); }
+    .fab-bar {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      background: rgba(244, 241, 234, 0.92);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-top: 1px solid var(--line);
+      padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+      display: flex;
+      gap: 8px;
+      max-width: 480px;
+      margin: 0 auto;
+      z-index: 10;
+    }
+    .fab-bar .btn { flex: 1; }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 84px;
+      transform: translateX(-50%);
+      background: var(--ink);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s;
+      z-index: 30;
+      max-width: 90%;
+    }
+    .toast.show { opacity: 1; }
+    .hidden { display: none !important; }
+    .share-box {
+      white-space: pre-wrap;
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 0.82rem;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      min-height: 120px;
+      color: var(--ink);
+    }
+    small.hint { color: var(--muted); display: block; margin-top: 6px; font-size: 0.8rem; }
+
+    /* Calendar */
+    .cal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .cal-head h2 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 650;
+      letter-spacing: -0.02em;
+      text-transform: none;
+      color: var(--ink);
+      flex: 1;
+      text-align: center;
+    }
+    .cal-head .btn {
+      width: 40px;
+      padding: 8px 0;
+      flex: 0 0 auto;
+    }
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 3px;
+      margin-bottom: 14px;
+    }
+    .cal-dow {
+      text-align: center;
+      font-size: 0.68rem;
+      font-weight: 650;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 4px 0 8px;
+    }
+    .cal-day {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      aspect-ratio: 1;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      cursor: pointer;
+      font: inherit;
+      color: var(--ink);
+      padding: 0;
+      position: relative;
+    }
+    .cal-day:disabled {
+      color: #c4beb4;
+      cursor: default;
+    }
+    .cal-day .n {
+      font-size: 0.9rem;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+    .cal-day .dots {
+      display: flex;
+      gap: 2px;
+      min-height: 5px;
+      align-items: center;
+    }
+    .cal-day .dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    .cal-day.has { background: #ebe6dc; }
+    .cal-day.selected {
+      background: var(--accent);
+      color: #fff;
+    }
+    .cal-day.selected .dot { background: #fff; }
+    .cal-day.today:not(.selected) {
+      box-shadow: inset 0 0 0 1.5px var(--accent);
+    }
+    .cal-summary {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .cal-summary .when {
+      font-weight: 650;
+      letter-spacing: -0.01em;
+    }
+    .cal-summary .count {
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+    .event-row {
+      display: grid;
+      grid-template-columns: 64px 1fr auto;
+      gap: 10px;
+      align-items: start;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .event-row:last-child { border-bottom: 0; }
+    .event-row .time {
+      font-size: 0.82rem;
+      font-variant-numeric: tabular-nums;
+      color: var(--muted);
+      padding-top: 2px;
+    }
+    .event-row .who { font-weight: 600; letter-spacing: -0.01em; }
+    .event-row .where { color: var(--muted); font-size: 0.85rem; margin-top: 1px; }
+    .event-list {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 2px 13px;
+      box-shadow: var(--shadow);
+    }
+    .stack { display: flex; flex-direction: column; gap: 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>PHNS Scheduler</h1>
+      <p class="sub">who · where · when</p>
+    </div>
+    <div id="sync-status">local…</div>
+  </header>
+
+  <nav class="tabs">
+    <button type="button" data-tab="cal" class="active">Calendar</button>
+    <button type="button" data-tab="day">Day</button>
+    <button type="button" data-tab="lookup">Find</button>
+    <button type="button" data-tab="people">People</button>
+    <button type="button" data-tab="share">Share</button>
+    <button type="button" data-tab="backup">Backup</button>
+  </nav>
+
+  <!-- CALENDAR -->
+  <section id="tab-cal">
+    <div class="filters">
+      <label for="cal-person">Person</label>
+      <select id="cal-person"></select>
+    </div>
+    <div class="cal-head">
+      <button type="button" class="btn" id="cal-prev" aria-label="Previous month">‹</button>
+      <h2 id="cal-title">July 2026</h2>
+      <button type="button" class="btn" id="cal-next" aria-label="Next month">›</button>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div class="cal-summary">
+      <div class="when" id="cal-selected-label">—</div>
+      <div class="count" id="cal-selected-count"></div>
+    </div>
+    <div id="cal-day-list"></div>
+  </section>
+
+  <!-- DAY -->
+  <section id="tab-day" class="hidden">
+    <div class="filters row">
+      <div>
+        <label for="day-date">Date</label>
+        <input type="date" id="day-date" />
+      </div>
+      <div>
+        <label for="day-person">Person</label>
+        <select id="day-person"></select>
+      </div>
+    </div>
+    <div id="day-list"></div>
+  </section>
+
+  <!-- LOOKUP -->
+  <section id="tab-lookup" class="hidden">
+    <div class="filters row">
+      <div>
+        <label for="lu-person">Person</label>
+        <select id="lu-person"></select>
+      </div>
+      <div>
+        <label for="lu-date">Date</label>
+        <input type="date" id="lu-date" />
+      </div>
+      <div>
+        <label for="lu-time">Time</label>
+        <input type="time" id="lu-time" value="16:00" />
+      </div>
+    </div>
+    <button type="button" class="btn btn-primary btn-block" id="lu-run">Find</button>
+    <div id="lu-result" style="margin-top:12px"></div>
+  </section>
+
+  <!-- PEOPLE -->
+  <section id="tab-people" class="hidden">
+    <div class="card">
+      <h2>Add person</h2>
+      <label for="p-name">Name</label>
+      <input id="p-name" placeholder="e.g. Adly Zahari" />
+      <div class="row" style="margin-top:8px">
+        <div>
+          <label for="p-title">Title</label>
+          <input id="p-title" placeholder="DS, Dato’…" />
+        </div>
+        <div>
+          <label for="p-party">Party</label>
+          <input id="p-party" placeholder="Amanah / PKR / DAP" />
+        </div>
+      </div>
+      <button type="button" class="btn btn-primary btn-block" id="p-add">Add person</button>
+    </div>
+    <div id="people-list"></div>
+  </section>
+
+  <!-- SHARE -->
+  <section id="tab-share" class="hidden">
+    <div class="filters row">
+      <div>
+        <label for="sh-date">Date</label>
+        <input type="date" id="sh-date" />
+      </div>
+      <div>
+        <label for="sh-person">Person</label>
+        <select id="sh-person"></select>
+      </div>
+    </div>
+    <label for="sh-header">Header (optional)</label>
+    <input id="sh-header" placeholder="e.g. Cadangan Kehadiran JKP Amanah…" />
+    <button type="button" class="btn btn-primary btn-block" id="sh-copy">Copy for WhatsApp</button>
+    <label style="margin-top:12px">Preview</label>
+    <div class="share-box" id="sh-preview"></div>
+  </section>
+
+  <!-- BACKUP -->
+  <section id="tab-backup" class="hidden">
+    <p class="empty" style="text-align:left;padding:0 0 12px">
+      Cloud auto-saves every change. Manual JSON is optional emergency only.
+    </p>
+    <div class="card" style="margin-bottom:12px">
+      <div class="meta">Sync</div>
+      <div class="title" id="bk-sync-label">—</div>
+      <button type="button" class="btn btn-primary btn-block" id="bk-sync-now" style="margin-top:10px">Sync now</button>
+    </div>
+    <button type="button" class="btn btn-block" id="bk-export">Export JSON</button>
+    <label for="bk-import" style="margin-top:14px">Import JSON</label>
+    <input type="file" id="bk-import" accept="application/json,.json" />
+    <small class="hint">Import replaces all people + events (then pushes to cloud).</small>
+  </section>
+
+  <!-- EDIT -->
+  <section id="tab-edit" class="hidden">
+    <div class="card">
+      <h2 id="edit-title" style="text-transform:none;letter-spacing:-0.01em;font-size:1rem;color:var(--ink)">Add event</h2>
+      <input type="hidden" id="e-id" />
+      <label for="e-person">Person</label>
+      <select id="e-person"></select>
+      <label for="e-place" style="margin-top:8px">Place / DUN</label>
+      <input id="e-place" placeholder="e.g. Paroi" list="dun-list" />
+      <datalist id="dun-list">
+        <option value="Paroi"></option>
+        <option value="Kota"></option>
+        <option value="Lenggeng"></option>
+        <option value="Bagan Pinang"></option>
+        <option value="Gemencheh"></option>
+        <option value="Senaling"></option>
+        <option value="Johol"></option>
+        <option value="Kuala Klawang"></option>
+        <option value="Serting"></option>
+      </datalist>
+      <div class="row" style="margin-top:8px">
+        <div>
+          <label for="e-date">Date</label>
+          <input type="date" id="e-date" />
+        </div>
+        <div>
+          <label for="e-start">Start</label>
+          <input type="time" id="e-start" value="09:00" />
+        </div>
+        <div>
+          <label for="e-end">End</label>
+          <input type="time" id="e-end" />
+        </div>
+      </div>
+      <label for="e-note" style="margin-top:8px">Note</label>
+      <textarea id="e-note" placeholder="Penamaan Calon, ceramah…"></textarea>
+      <div class="row" style="margin-top:12px">
+        <button type="button" class="btn" id="e-cancel">Cancel</button>
+        <button type="button" class="btn btn-primary" id="e-save">Save</button>
+      </div>
+      <button type="button" class="btn btn-danger btn-block hidden" id="e-delete">Delete event</button>
+    </div>
+  </section>
+
+  <div class="fab-bar" id="fab-bar">
+    <button type="button" class="btn btn-primary" id="btn-add">+ Add event</button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script>
+    const KEY = "phns-scheduler-v1";
+    const FIREBASE_CONFIG = {
+      apiKey: "AIzaSyA9UU0d5FSCPxtZFCuPlGledjJSlf8XI1Q",
+      authDomain: "etnaveravela-c97ac.firebaseapp.com",
+      projectId: "etnaveravela-c97ac",
+      storageBucket: "etnaveravela-c97ac.firebasestorage.app",
+      messagingSenderId: "569888719498",
+      appId: "1:569888719498:web:3846b64c9339041988e373",
+    };
+    // ponytail: one shared doc, last-write-wins; fine for single user
+    const CLOUD_PATH = "phns/data";
+
+    firebase.initializeApp(FIREBASE_CONFIG);
+    const cloudRef = firebase.firestore().doc(CLOUD_PATH);
+    let cloudReady = false;
+    let applyingRemote = false;
+    let cloudListening = false;
+
+    const SEED_PEOPLE = [
+      { id: "p1", name: "Adly Zahari", title: "", party: "Amanah" },
+      { id: "p2", name: "DS Dr Dzulkefly", title: "", party: "Amanah" },
+      { id: "p3", name: "Dato’ Aiman", title: "", party: "Amanah" },
+      { id: "p4", name: "DW Dr Hatta", title: "", party: "Amanah" },
+      { id: "p5", name: "Hj Khalid Samad", title: "", party: "Amanah" },
+      { id: "p6", name: "Hasbie Muda", title: "", party: "Amanah" },
+      { id: "p7", name: "Ridzwan Abu Bakar", title: "", party: "Amanah" },
+      { id: "p8", name: "DS Presiden", title: "", party: "Amanah" },
+      { id: "p9", name: "DS Timbalan Presiden", title: "", party: "Amanah" },
+    ];
+    const SEED_EVENTS = [
+      { id: "e1", personId: "p1", place: "Paroi", date: "2026-07-18", start: "09:00", end: "", note: "Penamaan Calon PRN N9" },
+      { id: "e2", personId: "p2", place: "Kota", date: "2026-07-18", start: "09:00", end: "", note: "Penamaan Calon PRN N9" },
+      { id: "e3", personId: "p3", place: "Lenggeng", date: "2026-07-18", start: "09:00", end: "", note: "Penamaan Calon PRN N9" },
+      { id: "e4", personId: "p4", place: "Bagan Pinang", date: "2026-07-18", start: "09:00", end: "", note: "Penamaan Calon PRN N9" },
+      { id: "e5", personId: "p5", place: "Gemencheh", date: "2026-07-18", start: "09:00", end: "", note: "Penamaan Calon PRN N9" },
+      { id: "e6", personId: "p6", place: "Senaling", date: "2026-07-18", start: "09:00", end: "", note: "Penamaan Calon PRN N9" },
+      { id: "e7", personId: "p7", place: "Johol", date: "2026-07-18", start: "09:00", end: "", note: "Penamaan Calon PRN N9" },
+      { id: "e8", personId: "p8", place: "Kuala Klawang", date: "2026-07-18", start: "09:00", end: "", note: "Penamaan Calon PRN N9" },
+      { id: "e9", personId: "p9", place: "Serting", date: "2026-07-18", start: "09:00", end: "", note: "Penamaan Calon PRN N9" },
+    ];
+
+    let db = load();
+    let currentTab = "cal";
+    let calYear = 2026;
+    let calMonth = 6; // 0-indexed July
+    let calSelected = "2026-07-18";
+
+    function uid(prefix) {
+      return prefix + Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-4);
+    }
+
+    function load() {
+      try {
+        const raw = localStorage.getItem(KEY);
+        if (raw) {
+          const data = JSON.parse(raw);
+          if (Array.isArray(data.people) && Array.isArray(data.events)) return data;
+        }
+      } catch (_) {}
+      return { people: SEED_PEOPLE.slice(), events: SEED_EVENTS.slice(), updatedAt: Date.now() };
+    }
+
+    function setSyncStatus(msg, kind) {
+      const el = document.getElementById("sync-status");
+      el.textContent = msg;
+      el.classList.remove("ok", "err");
+      if (kind) el.classList.add(kind);
+      const bk = document.getElementById("bk-sync-label");
+      if (bk) bk.textContent = msg;
+    }
+
+    function persistLocal() {
+      localStorage.setItem(KEY, JSON.stringify(db));
+    }
+
+    function save() {
+      db.updatedAt = Date.now();
+      persistLocal();
+      pushCloud();
+    }
+
+    async function pushCloud() {
+      if (applyingRemote) return;
+      try {
+        setSyncStatus("saving…");
+        await cloudRef.set({
+          people: db.people,
+          events: db.events,
+          updatedAt: db.updatedAt || Date.now(),
+        });
+        cloudReady = true;
+        setSyncStatus("cloud · ok", "ok");
+      } catch (e) {
+        console.error(e);
+        setSyncStatus("cloud · offline", "err");
+      }
+    }
+
+    function applyRemote(data) {
+      if (!data || !Array.isArray(data.people) || !Array.isArray(data.events)) return false;
+      applyingRemote = true;
+      db = {
+        people: data.people,
+        events: data.events,
+        updatedAt: data.updatedAt || Date.now(),
+      };
+      persistLocal();
+      fillPersonSelects();
+      if (currentTab === "cal") renderCal();
+      else if (currentTab === "day") renderDay();
+      else if (currentTab === "people") renderPeople();
+      else if (currentTab === "share") renderShare();
+      applyingRemote = false;
+      return true;
+    }
+
+    async function pullCloud() {
+      try {
+        setSyncStatus("syncing…");
+        const snap = await cloudRef.get();
+        if (snap.exists) {
+          const data = snap.data();
+          const remoteAt = data.updatedAt || 0;
+          const localAt = db.updatedAt || 0;
+          if (remoteAt >= localAt) {
+            applyRemote(data);
+          } else {
+            await pushCloud();
+          }
+        } else {
+          await pushCloud();
+        }
+        cloudReady = true;
+        setSyncStatus("cloud · ok", "ok");
+        if (!cloudListening) {
+          cloudListening = true;
+          cloudRef.onSnapshot(
+            (s) => {
+              if (!s.exists) return;
+              const data = s.data();
+              const remoteAt = data.updatedAt || 0;
+              if (remoteAt <= (db.updatedAt || 0)) return;
+              applyRemote(data);
+              setSyncStatus("cloud · ok", "ok");
+            },
+            () => setSyncStatus("cloud · offline", "err")
+          );
+        }
+      } catch (e) {
+        console.error(e);
+        cloudReady = false;
+        setSyncStatus("local only", "err");
+      }
+    }
+
+    function toast(msg) {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.classList.add("show");
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => el.classList.remove("show"), 1800);
+    }
+
+    function todayStr() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    }
+
+    function personById(id) {
+      return db.people.find((p) => p.id === id);
+    }
+
+    function personLabel(p) {
+      if (!p) return "?";
+      return (p.title ? p.title + " " : "") + p.name;
+    }
+
+    function fmtDate(iso) {
+      if (!iso) return "";
+      const [y, m, d] = iso.split("-").map(Number);
+      return new Date(y, m - 1, d).toLocaleDateString("en-GB", {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      });
+    }
+
+    function fmtMonth(y, m0) {
+      return new Date(y, m0, 1).toLocaleDateString("en-GB", { month: "long", year: "numeric" });
+    }
+
+    function timeToMin(t) {
+      if (!t) return null;
+      const [h, m] = t.split(":").map(Number);
+      return h * 60 + m;
+    }
+
+    function eventCovers(ev, min) {
+      const s = timeToMin(ev.start);
+      if (s == null) return false;
+      if (min < s) return false;
+      const e = timeToMin(ev.end);
+      if (e == null) return min < s + 60;
+      return min < e;
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function eventsForDay(date, personId) {
+      return db.events
+        .filter((e) => e.date === date && (!personId || e.personId === personId))
+        .sort((a, b) => (a.start || "").localeCompare(b.start || "") || a.place.localeCompare(b.place));
+    }
+
+    function countsByDate(personId) {
+      const map = {};
+      for (const e of db.events) {
+        if (personId && e.personId !== personId) continue;
+        map[e.date] = (map[e.date] || 0) + 1;
+      }
+      return map;
+    }
+
+    function fillPersonSelects() {
+      const sorted = db.people.slice().sort((a, b) => a.name.localeCompare(b.name));
+      const opts =
+        `<option value="">All people</option>` +
+        sorted
+          .map((p) => `<option value="${p.id}">${escapeHtml(personLabel(p))}${p.party ? " (" + escapeHtml(p.party) + ")" : ""}</option>`)
+          .join("");
+      const required =
+        sorted
+          .map((p) => `<option value="${p.id}">${escapeHtml(personLabel(p))}${p.party ? " (" + escapeHtml(p.party) + ")" : ""}</option>`)
+          .join("") || `<option value="">No people yet</option>`;
+
+      for (const id of ["day-person", "sh-person", "cal-person"]) {
+        const el = document.getElementById(id);
+        const prev = el.value;
+        el.innerHTML = opts;
+        if ([...el.options].some((o) => o.value === prev)) el.value = prev;
+      }
+      for (const id of ["lu-person", "e-person"]) {
+        const el = document.getElementById(id);
+        const prev = el.value;
+        el.innerHTML = required;
+        if ([...el.options].some((o) => o.value === prev)) el.value = prev;
+      }
+    }
+
+    function eventRowsHtml(list) {
+      if (!list.length) return `<div class="empty">No events.</div>`;
+      return `<div class="event-list stack">${list
+        .map((ev) => {
+          const p = personById(ev.personId);
+          const time = ev.end ? `${ev.start}–${ev.end}` : ev.start || "—";
+          return `<div class="event-row">
+            <div class="time">${escapeHtml(time)}</div>
+            <div>
+              <div class="who">${escapeHtml(personLabel(p))}</div>
+              <div class="where">${escapeHtml(ev.place)}${ev.note ? " · " + escapeHtml(ev.note) : ""}</div>
+            </div>
+            <button type="button" class="btn btn-sm btn-ghost" data-edit="${ev.id}">Edit</button>
+          </div>`;
+        })
+        .join("")}</div>`;
+    }
+
+    function renderDay() {
+      const date = document.getElementById("day-date").value;
+      const personId = document.getElementById("day-person").value;
+      const list = eventsForDay(date, personId);
+      const root = document.getElementById("day-list");
+      if (!list.length) {
+        root.innerHTML = `<div class="empty">No events on ${escapeHtml(fmtDate(date))}.</div>`;
+        return;
+      }
+      root.innerHTML = eventRowsHtml(list);
+    }
+
+    function renderCal() {
+      const personId = document.getElementById("cal-person").value;
+      const counts = countsByDate(personId);
+      const title = document.getElementById("cal-title");
+      const grid = document.getElementById("cal-grid");
+      title.textContent = fmtMonth(calYear, calMonth);
+
+      const first = new Date(calYear, calMonth, 1);
+      const startDow = first.getDay(); // 0 Sun
+      const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+      const today = todayStr();
+
+      const cells = [];
+      cells.push(
+        ...["S", "M", "T", "W", "T", "F", "S"].map((d) => `<div class="cal-dow">${d}</div>`)
+      );
+
+      for (let i = 0; i < startDow; i++) {
+        cells.push(`<button type="button" class="cal-day" disabled></button>`);
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const iso = `${calYear}-${String(calMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+        const n = counts[iso] || 0;
+        const cls = [
+          "cal-day",
+          n ? "has" : "",
+          iso === calSelected ? "selected" : "",
+          iso === today ? "today" : "",
+        ]
+          .filter(Boolean)
+          .join(" ");
+        const dots =
+          n > 0
+            ? `<span class="dots">${Array(Math.min(n, 3))
+                .fill('<span class="dot"></span>')
+                .join("")}</span>`
+            : `<span class="dots"></span>`;
+        cells.push(
+          `<button type="button" class="${cls}" data-date="${iso}" aria-label="${iso}${n ? ", " + n + " events" : ""}">
+            <span class="n">${day}</span>${dots}
+          </button>`
+        );
+      }
+
+      grid.innerHTML = cells.join("");
+      renderCalDayList();
+    }
+
+    function renderCalDayList() {
+      const personId = document.getElementById("cal-person").value;
+      const list = eventsForDay(calSelected, personId);
+      document.getElementById("cal-selected-label").textContent = fmtDate(calSelected);
+      document.getElementById("cal-selected-count").textContent = list.length
+        ? `${list.length} event${list.length === 1 ? "" : "s"}`
+        : "free";
+      const root = document.getElementById("cal-day-list");
+      root.innerHTML = list.length
+        ? eventRowsHtml(list)
+        : `<div class="empty">Nothing scheduled.</div>`;
+    }
+
+    function renderPeople() {
+      const root = document.getElementById("people-list");
+      if (!db.people.length) {
+        root.innerHTML = `<div class="empty">No people yet.</div>`;
+        return;
+      }
+      root.innerHTML = db.people
+        .slice()
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((p) => {
+          const n = db.events.filter((e) => e.personId === p.id).length;
+          return `<div class="card">
+            <div class="title">${escapeHtml(personLabel(p))}</div>
+            <div class="meta">${p.party ? escapeHtml(p.party) + " · " : ""}${n} event${n === 1 ? "" : "s"}</div>
+            <div class="actions">
+              <button type="button" class="btn btn-sm btn-danger" data-del-person="${p.id}">Remove</button>
+            </div>
+          </div>`;
+        })
+        .join("");
+    }
+
+    function buildShareText() {
+      const date = document.getElementById("sh-date").value;
+      const personId = document.getElementById("sh-person").value;
+      const header = document.getElementById("sh-header").value.trim();
+      const list = eventsForDay(date, personId);
+      const lines = [];
+      if (header) lines.push(header);
+      else lines.push(`Schedule — ${fmtDate(date)}`);
+      if (!list.length) lines.push("(no events)");
+      else {
+        list.forEach((ev, i) => {
+          const p = personById(ev.personId);
+          const time = ev.end ? `${ev.start}–${ev.end}` : ev.start || "";
+          const core = `${ev.place} - ${personLabel(p)}`;
+          lines.push(time ? `${i + 1}) ${time}  ${core}` : `${i + 1}) ${core}`);
+          if (ev.note) lines.push(`   ${ev.note}`);
+        });
+      }
+      return lines.join("\n");
+    }
+
+    function renderShare() {
+      document.getElementById("sh-preview").textContent = buildShareText();
+    }
+
+    function openEdit(id) {
+      showTab("edit");
+      const isNew = !id;
+      document.getElementById("edit-title").textContent = isNew ? "Add event" : "Edit event";
+      document.getElementById("e-delete").classList.toggle("hidden", isNew);
+      fillPersonSelects();
+      if (isNew) {
+        document.getElementById("e-id").value = "";
+        document.getElementById("e-place").value = "";
+        document.getElementById("e-date").value =
+          calSelected || document.getElementById("day-date").value || todayStr();
+        document.getElementById("e-start").value = "09:00";
+        document.getElementById("e-end").value = "";
+        document.getElementById("e-note").value = "";
+        const dayPerson = document.getElementById("day-person").value || document.getElementById("cal-person").value;
+        if (dayPerson) document.getElementById("e-person").value = dayPerson;
+        return;
+      }
+      const ev = db.events.find((e) => e.id === id);
+      if (!ev) return;
+      document.getElementById("e-id").value = ev.id;
+      document.getElementById("e-person").value = ev.personId;
+      document.getElementById("e-place").value = ev.place;
+      document.getElementById("e-date").value = ev.date;
+      document.getElementById("e-start").value = ev.start || "09:00";
+      document.getElementById("e-end").value = ev.end || "";
+      document.getElementById("e-note").value = ev.note || "";
+    }
+
+    function saveEvent() {
+      const id = document.getElementById("e-id").value;
+      const personId = document.getElementById("e-person").value;
+      const place = document.getElementById("e-place").value.trim();
+      const date = document.getElementById("e-date").value;
+      const start = document.getElementById("e-start").value;
+      const end = document.getElementById("e-end").value;
+      const note = document.getElementById("e-note").value.trim();
+      if (!personId || !place || !date || !start) {
+        toast("Person, place, date, start required");
+        return;
+      }
+      if (end && timeToMin(end) <= timeToMin(start)) {
+        toast("End must be after start");
+        return;
+      }
+      if (id) {
+        const ev = db.events.find((e) => e.id === id);
+        if (!ev) return;
+        Object.assign(ev, { personId, place, date, start, end, note });
+      } else {
+        db.events.push({ id: uid("e"), personId, place, date, start, end, note });
+      }
+      save();
+      calSelected = date;
+      const [y, m] = date.split("-").map(Number);
+      calYear = y;
+      calMonth = m - 1;
+      document.getElementById("day-date").value = date;
+      document.getElementById("sh-date").value = date;
+      showTab("cal");
+      toast("Saved");
+    }
+
+    function deleteEvent() {
+      const id = document.getElementById("e-id").value;
+      if (!id || !confirm("Delete this event?")) return;
+      db.events = db.events.filter((e) => e.id !== id);
+      save();
+      showTab("cal");
+      toast("Deleted");
+    }
+
+    function runLookup() {
+      const personId = document.getElementById("lu-person").value;
+      const date = document.getElementById("lu-date").value;
+      const time = document.getElementById("lu-time").value;
+      const root = document.getElementById("lu-result");
+      if (!personId || !date || !time) {
+        toast("Pick person, date, time");
+        return;
+      }
+      const p = personById(personId);
+      const min = timeToMin(time);
+      const dayEv = db.events
+        .filter((e) => e.personId === personId && e.date === date)
+        .sort((a, b) => (a.start || "").localeCompare(b.start || ""));
+
+      const at = dayEv.filter((e) => eventCovers(e, min));
+      let before = null;
+      let after = null;
+      for (const e of dayEv) {
+        const s = timeToMin(e.start);
+        if (s == null) continue;
+        if (s <= min) before = e;
+        if (s > min && !after) after = e;
+      }
+      const endedBefore = dayEv.filter((e) => {
+        const end = timeToMin(e.end);
+        const s = timeToMin(e.start);
+        const endMin = end != null ? end : s + 60;
+        return endMin <= min;
+      });
+      if (endedBefore.length) before = endedBefore[endedBefore.length - 1];
+      if (at.length) {
+        const lastEnd = Math.max(
+          ...at.map((e) => {
+            const end = timeToMin(e.end);
+            const s = timeToMin(e.start);
+            return end != null ? end : s + 60;
+          })
+        );
+        after = dayEv.find((e) => timeToMin(e.start) >= lastEnd) || null;
+      }
+
+      const parts = [];
+      parts.push(`<div class="card"><div class="meta">${escapeHtml(fmtDate(date))} · ${escapeHtml(time)}</div>
+        <div class="title">${escapeHtml(personLabel(p))}</div></div>`);
+
+      if (at.length) {
+        parts.push(`<div class="card"><span class="tag hit">At this time</span>
+          ${at
+            .map((ev) => {
+              const t = ev.end ? `${ev.start}–${ev.end}` : ev.start;
+              return `<div class="title" style="margin-top:8px">${escapeHtml(t)} @ ${escapeHtml(ev.place)}</div>
+                ${ev.note ? `<div class="meta">${escapeHtml(ev.note)}</div>` : ""}`;
+            })
+            .join("")}
+        </div>`);
+      } else {
+        parts.push(`<div class="card"><span class="tag">Free</span>
+          <div class="meta" style="margin-top:6px">No event at ${escapeHtml(time)}.</div></div>`);
+      }
+
+      if (before) {
+        const t = before.end ? `${before.start}–${before.end}` : before.start;
+        parts.push(`<div class="card"><span class="tag near">Before</span>
+          <div class="title" style="margin-top:8px">${escapeHtml(t)} @ ${escapeHtml(before.place)}</div>
+          ${before.note ? `<div class="meta">${escapeHtml(before.note)}</div>` : ""}
+        </div>`);
+      }
+      if (after) {
+        const t = after.end ? `${after.start}–${after.end}` : after.start;
+        parts.push(`<div class="card"><span class="tag near">After</span>
+          <div class="title" style="margin-top:8px">${escapeHtml(t)} @ ${escapeHtml(after.place)}</div>
+          ${after.note ? `<div class="meta">${escapeHtml(after.note)}</div>` : ""}
+        </div>`);
+      }
+      if (!at.length && !before && !after) {
+        parts.push(`<div class="empty">No events for this person on ${escapeHtml(fmtDate(date))}.</div>`);
+      }
+      root.innerHTML = parts.join("");
+    }
+
+    function showTab(name) {
+      currentTab = name;
+      for (const t of ["cal", "day", "lookup", "people", "share", "backup", "edit"]) {
+        document.getElementById("tab-" + t).classList.toggle("hidden", t !== name);
+      }
+      document.querySelectorAll("nav.tabs button").forEach((b) => {
+        b.classList.toggle("active", b.dataset.tab === name);
+      });
+      document.getElementById("fab-bar").classList.toggle("hidden", name === "edit" || name === "backup");
+      if (name === "cal") renderCal();
+      if (name === "day") renderDay();
+      if (name === "people") renderPeople();
+      if (name === "share") renderShare();
+      if (name === "lookup") fillPersonSelects();
+    }
+
+    document.querySelectorAll("nav.tabs button").forEach((b) => {
+      b.addEventListener("click", () => {
+        fillPersonSelects();
+        showTab(b.dataset.tab);
+      });
+    });
+
+    document.getElementById("cal-prev").addEventListener("click", () => {
+      calMonth -= 1;
+      if (calMonth < 0) {
+        calMonth = 11;
+        calYear -= 1;
+      }
+      renderCal();
+    });
+    document.getElementById("cal-next").addEventListener("click", () => {
+      calMonth += 1;
+      if (calMonth > 11) {
+        calMonth = 0;
+        calYear += 1;
+      }
+      renderCal();
+    });
+    document.getElementById("cal-person").addEventListener("change", renderCal);
+    document.getElementById("cal-grid").addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-date]");
+      if (!btn) return;
+      calSelected = btn.getAttribute("data-date");
+      document.getElementById("day-date").value = calSelected;
+      document.getElementById("sh-date").value = calSelected;
+      renderCal();
+    });
+    document.getElementById("cal-day-list").addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-edit]");
+      if (btn) openEdit(btn.getAttribute("data-edit"));
+    });
+
+    document.getElementById("day-date").addEventListener("change", () => {
+      calSelected = document.getElementById("day-date").value;
+      renderDay();
+    });
+    document.getElementById("day-person").addEventListener("change", renderDay);
+    document.getElementById("day-list").addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-edit]");
+      if (btn) openEdit(btn.getAttribute("data-edit"));
+    });
+
+    document.getElementById("btn-add").addEventListener("click", () => openEdit(null));
+    document.getElementById("e-cancel").addEventListener("click", () => showTab("cal"));
+    document.getElementById("e-save").addEventListener("click", saveEvent);
+    document.getElementById("e-delete").addEventListener("click", deleteEvent);
+
+    document.getElementById("lu-run").addEventListener("click", runLookup);
+
+    document.getElementById("p-add").addEventListener("click", () => {
+      const name = document.getElementById("p-name").value.trim();
+      const title = document.getElementById("p-title").value.trim();
+      const party = document.getElementById("p-party").value.trim();
+      if (!name) {
+        toast("Name required");
+        return;
+      }
+      db.people.push({ id: uid("p"), name, title, party });
+      save();
+      document.getElementById("p-name").value = "";
+      document.getElementById("p-title").value = "";
+      document.getElementById("p-party").value = "";
+      fillPersonSelects();
+      renderPeople();
+      toast("Person added");
+    });
+
+    document.getElementById("people-list").addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-del-person]");
+      if (!btn) return;
+      const id = btn.getAttribute("data-del-person");
+      const n = db.events.filter((ev) => ev.personId === id).length;
+      if (!confirm(n ? `Remove person and their ${n} event(s)?` : "Remove person?")) return;
+      db.events = db.events.filter((ev) => ev.personId !== id);
+      db.people = db.people.filter((p) => p.id !== id);
+      save();
+      fillPersonSelects();
+      renderPeople();
+      toast("Removed");
+    });
+
+    document.getElementById("sh-date").addEventListener("change", renderShare);
+    document.getElementById("sh-person").addEventListener("change", renderShare);
+    document.getElementById("sh-header").addEventListener("input", renderShare);
+    document.getElementById("sh-copy").addEventListener("click", async () => {
+      const text = buildShareText();
+      try {
+        await navigator.clipboard.writeText(text);
+        toast("Copied — paste in WhatsApp");
+      } catch (_) {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        ta.remove();
+        toast("Copied — paste in WhatsApp");
+      }
+    });
+
+    document.getElementById("bk-export").addEventListener("click", () => {
+      const blob = new Blob([JSON.stringify(db, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `phns-scheduler-backup-${todayStr()}.json`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      toast("Backup downloaded");
+    });
+
+    document.getElementById("bk-import").addEventListener("change", async (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+        if (!Array.isArray(data.people) || !Array.isArray(data.events)) throw new Error("bad shape");
+        if (!confirm("Replace all data with this backup + push to cloud?")) {
+          e.target.value = "";
+          return;
+        }
+        db = { people: data.people, events: data.events, updatedAt: Date.now() };
+        save();
+        fillPersonSelects();
+        showTab("cal");
+        toast("Restored + cloud");
+      } catch (_) {
+        toast("Invalid backup file");
+      }
+      e.target.value = "";
+    });
+
+    document.getElementById("bk-sync-now").addEventListener("click", async () => {
+      await pullCloud();
+      toast(cloudReady ? "Synced" : "Cloud offline");
+    });
+
+    // init
+    const t = todayStr();
+    document.getElementById("day-date").value = t;
+    document.getElementById("lu-date").value = t;
+    document.getElementById("sh-date").value = t;
+    if (t <= "2026-07-18") {
+      document.getElementById("day-date").value = "2026-07-18";
+      document.getElementById("sh-date").value = "2026-07-18";
+      calSelected = "2026-07-18";
+      calYear = 2026;
+      calMonth = 6;
+    } else {
+      const d = new Date();
+      calSelected = t;
+      calYear = d.getFullYear();
+      calMonth = d.getMonth();
+    }
+    if (!db.updatedAt) db.updatedAt = Date.now();
+    persistLocal();
+    fillPersonSelects();
+    showTab("cal");
+    pullCloud();
+  </script>
+</body>
+</html>
