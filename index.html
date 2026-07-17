@@ -1,72 +1,15 @@
-
 <!doctype html>
 <html lang="en">
-<head><script data-od-sandbox-shim>(function(){
-  function makeStore(){
-    var data = {};
-    var api = {
-      getItem: function(k){ return Object.prototype.hasOwnProperty.call(data, k) ? data[k] : null; },
-      setItem: function(k, v){ data[k] = String(v); },
-      removeItem: function(k){ delete data[k]; },
-      clear: function(){ data = {}; },
-      key: function(i){ return Object.keys(data)[i] || null; }
-    };
-    Object.defineProperty(api, 'length', { get: function(){ return Object.keys(data).length; } });
-    return api;
-  }
-  function tryShim(name){
-    var works = false;
-    try { works = !!window[name] && typeof window[name].getItem === 'function'; void window[name].length; }
-    catch (_) { works = false; }
-    if (works) return;
-    try { Object.defineProperty(window, name, { configurable: true, value: makeStore() }); }
-    catch (_) { try { window[name] = makeStore(); } catch (__) {} }
-  }
-  tryShim('localStorage');
-  tryShim('sessionStorage');
-  document.addEventListener('click', (e) => {
-    if (!e.target || !(e.target instanceof Element)) return;
-    var link = e.target.closest('a[href]');
-    if (!link) return;
-    var href = link.getAttribute('href');
-    if (href === null) return;
-    var isAnchor = href.startsWith('#') || href === '';
-    if (isAnchor) {
-      e.preventDefault();
-      if (href === '' || href === '#') {
-        window.scrollTo({ top: 0 });
-        history.replaceState(null, '', ' ');
-      } else {
-        var targetId = href.slice(1);
-        var target = targetId ? document.getElementById(targetId) : null;
-        if (target) {
-          target.scrollIntoView();
-          location.hash === href && history.replaceState(null, '', ' ');
-          location.hash = href;
-        }
-      }
-    } else if (link.getAttribute('target') === '_blank') {
-      e.preventDefault();
-      let safe = false;
-      try {
-        var url = new URL(href, location.href);
-        safe =
-          url.protocol === 'http:' ||
-          url.protocol === 'https:' ||
-          url.protocol === 'mailto:';
-      } catch (_) {}
-      safe && window.open(href, '_blank', 'noopener,noreferrer');
-    }
-  });
-})();</script>
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>azri ehsan</title>
-<meta name="description" content="azri ehsan - i build AI systems and ship them. NLP, computer vision, fullstack.">
-<meta name="author" content="Azri Ehsan">
-<meta property="og:title" content="azri ehsan">
-<meta property="og:description" content="i build AI systems and ship them.">
+<title>Muhammad Azri Ehsan | Fullstack AI Engineer | Kuala Lumpur</title>
+<meta name="description" content="Portfolio of Muhammad Azri Ehsan, a fullstack AI engineer in Kuala Lumpur building AI systems with Python, FastAPI, PostgreSQL, and React.">
+<meta name="author" content="Muhammad Azri Ehsan">
+<meta property="og:title" content="Muhammad Azri Ehsan | Fullstack AI Engineer">
+<meta property="og:description" content="Portfolio of Muhammad Azri Ehsan, a fullstack AI engineer in Kuala Lumpur building AI systems with Python, FastAPI, PostgreSQL, and React.">
 <meta property="og:type" content="website">
+<link rel="canonical" href="https://azri.work/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
@@ -203,7 +146,7 @@ ul{list-style:none}
   font-family:var(--font-mono);color:var(--soft);font-size:.83rem}
 .project ul.bullets b{font-weight:600}
 
-/* flagship - Mīzān: rooted, more space, serif accent index, result-first */
+/* flagship project: rooted, more space, serif accent index, result-first */
 .project.flagship{--idx:5.5rem;gap:clamp(1.5rem,5vw,3.75rem);
   padding-block:clamp(3.5rem,7vw,5.5rem) clamp(3rem,6vw,4.25rem)}
 .project.flagship .idx{font-family:var(--font-display);font-weight:600;
@@ -280,12 +223,12 @@ ul{list-style:none}
 /* theme toggle */
 .theme-btn{background:none;border:1px solid var(--border);color:var(--muted);padding:.3rem .55rem;border-radius:6px;cursor:pointer;font-family:var(--font-mono);font-size:.75rem;transition:all .15s}
 .theme-btn:hover{color:var(--fg);border-color:var(--fg)}
-[data-theme="dark"]{--bg:#0f0f1a;--surface:#1a1a2e;--fg:#e4e4e7;--muted:#a1a1aa;--soft:#71717a;--border:#27272a;--accent-soft:color-mix(in srgb,var(--accent) 12%,var(--bg));--paper-tint:#16162a}
+[data-theme="dark"]{--bg:#0f0f1a;--surface:#1a1a2e;--fg:#e4e4e7;--muted:#a1a1aa;--soft:#71717a;--border:#27272a;--accent:#6b9aff;--accent-soft:color-mix(in srgb,var(--accent) 12%,var(--bg));--paper-tint:#16162a}
 [data-theme="dark"] .nav{background:color-mix(in srgb,var(--bg) 94%,transparent)}
 </style>
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="azri ehsan">
-<meta name="twitter:description" content="i build AI systems and ship them.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Muhammad Azri Ehsan | Fullstack AI Engineer">
+<meta name="twitter:description" content="Portfolio of Muhammad Azri Ehsan, a fullstack AI engineer in Kuala Lumpur building AI systems with Python, FastAPI, PostgreSQL, and React.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231d4ed8'/><text x='16' y='22' text-anchor='middle' font-family='serif' font-size='18' font-weight='700' fill='white'>A</text></svg>">
 </head>
 <body>
@@ -298,6 +241,7 @@ ul{list-style:none}
     <div class="nav-links">
       <a href="#work" class="lg-only" aria-label="View projects">work</a>
       <a href="#skills" class="lg-only" aria-label="View skills">skills</a>
+      <a href="https://www.linkedin.com/in/azriehsan" target="_blank" rel="noopener" aria-label="LinkedIn profile">linkedin ↗</a>
       <a href="https://github.com/azrirefik" target="_blank" rel="noopener" class="cta" aria-label="GitHub profile">github ↗</a>
       <button class="theme-btn" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">◐</button>
       <button class="hamburger" id="hamburger" aria-label="Toggle navigation" aria-expanded="false"><span></span><span></span><span></span></button>
@@ -306,6 +250,7 @@ ul{list-style:none}
   <div class="mobile-menu" id="mobileMenu">
     <a href="#work">work</a>
     <a href="#skills">skills</a>
+    <a href="https://www.linkedin.com/in/azriehsan" target="_blank" rel="noopener">linkedin ↗</a>
     <a href="https://github.com/azrirefik" target="_blank" rel="noopener" class="cta">github ↗</a>
   </div>
 </nav>
@@ -325,11 +270,12 @@ ul{list-style:none}
     </div>
 
     <aside class="spec" aria-label="Author metadata">
-      <div class="spec-row"><span class="k">location</span><span class="v">KL, Malaysia</span></div>
+      <div class="spec-row"><span class="k">location</span><span class="v">Kuala Lumpur, Malaysia</span></div>
       <div class="spec-row"><span class="k">now</span><span class="v accent">Gamuda AI Academy · C6</span></div>
-      <div class="spec-row"><span class="k">previous</span><span class="v">Junior Dev @ Cynco</span></div>
-      <div class="spec-row"><span class="k">links</span><span class="v"><a href="https://github.com/azrirefik" target="_blank" rel="noopener">github</a> · <a href="https://www.linkedin.com/in/azriehsan" target="_blank" rel="noopener">in</a></span></div>
-      <div class="spec-row"><span class="k">email</span><span class="v">hello@azri.work</span></div>
+      <div class="spec-row"><span class="k">previous</span><span class="v">Software Developer Intern @ Cynco</span></div>
+      <div class="spec-row"><span class="k">cert</span><span class="v accent">Microsoft Certified: Azure AI Engineer Associate (AI-102)</span></div>
+      <div class="spec-row"><span class="k">links</span><span class="v"><a href="https://github.com/azrirefik" target="_blank" rel="noopener">github</a> · <a href="https://www.linkedin.com/in/azriehsan" target="_blank" rel="noopener">linkedin</a></span></div>
+      <div class="spec-row"><span class="k">email</span><span class="v"><a href="mailto:hello@azri.work">hello@azri.work</a></span></div>
     </aside>
   </div>
 </header>
@@ -341,42 +287,19 @@ ul{list-style:none}
       <h2>Selected work</h2>
     </div>
 
-    <!-- 01 Mīzān -->
+    <!-- 01 MachineIQ -->
     <article class="project flagship">
       <div class="idx">01</div>
       <div>
-        <h3>Mīzān <span class="arabic" lang="ar" dir="rtl">ميزان</span></h3>
-        <p class="result">Validates every verse in the Quran. Won't mislabel authentic scripture.</p>
-        <p class="proj-year">2026</p>
-        <p class="desc">An NLP validation engine that catches hallucinated Quran verses in LLM output, guarding against a failure mode where models generate text that looks Arabic but isn't scripture.</p>
-        <ul class="bullets">
-          <li><b>6-stage Arabic normalization pipeline</b> + greedy binary-search fabrication detection.</li>
-          <li>Ships four ways: npm library, PWA web app, Chrome extension (MV3), and a FastAPI microservice on Railway.</li>
-          <li>Bundles an LLM accuracy benchmark testing GPT / Claude / Gemini on 50 Quran prompts.</li>
-        </ul>
-        <div class="tags">
-          <span class="tag">TypeScript</span><span class="tag">Python</span><span class="tag">FastAPI</span>
-          <span class="tag">Docker</span><span class="tag">Chrome Ext MV3</span><span class="tag">PWA</span>
-        </div>
-        <div class="proj-links">
-          <a href="https://github.com/azrirefik/mizan-checker" target="_blank" rel="noopener">azrirefik/mizan-checker</a>
-          <a href="https://azri.work/mizan-checker" target="_blank" rel="noopener" class="secondary">azri.work/mizan-checker</a>
-        </div>
-      </div>
-    </article>
-
-    <!-- 02 MachineIQ -->
-    <article class="project">
-      <div class="idx">02</div>
-      <div>
         <h3>MachineIQ</h3>
-        <p class="role">AI-powered predictive maintenance platform, real-time telemetry & alerting for industrial AHUs</p>
-        <p class="proj-year">2026 · Gamuda AI Academy C6 · in progress</p>
-        <p class="desc">An AI-powered predictive maintenance platform built at Gamuda AI Academy C6, for facilities managing 10-100+ industrial AHUs. Ingests real-time telemetry from IoT gateways, calculates health scores, detects anomalies via a configurable rule engine, and generates AI-powered repair guides from uploaded SOPs and repair history.</p>
+        <p class="role">AI-powered maintenance intelligence platform for industrial AHUs, from early condition warning through guided resolution and maintenance learning</p>
+        <p class="proj-year">2026 · Gamuda AI Academy C6 · technical contributor + product owner / stakeholder-facing + QA contributor</p>
+        <p class="desc">Predictive maintenance intelligence for industrial AHUs. Early condition warnings, deterministic simulation evidence, and a RAG-driven resolution guide.</p>
         <ul class="bullets">
-          <li><b>Configurable rule engine</b>: flow-graph anomaly detection (trigger, condition, action), time-based escalation chains for technician notifications, sandboxed javascript conditions via quickjs.</li>
-          <li><b>FastAPI + LangGraph backend</b>: 14 REST endpoints, 5 relational tables, event-driven telemetry ingestion, offline detection, AI knowledge base for step-by-step resolution guides.</li>
-          <li>React 19 frontend with TypeScript, shadcn/ui, 21-day telemetry visualizations (airflow, fan speed, filter dp, temp).</li>
+          <li><b>Quality-gated 7-day OLS</b> regression with a supported filter signature: usable DP rising AND (usable CFM falling OR usable fan power rising); SAT can support evidence but cannot independently admit a warning.</li>
+          <li><b>Deterministic simulation proxy evidence</b>: gradual degradation shows a 377h lead time, normal operation produces no false watch, sudden faults are rule-owned, and recovery clears the alert. This is simulation evidence, not field accuracy.</li>
+          <li><b>FastAPI / PostgreSQL / React</b> stack with a RAG-based resolution-guide workflow over SOPs and repair history.</li>
+          <li>Technical contributor plus product owner / stakeholder-facing and QA contributor.</li>
         </ul>
         <div class="tags">
           <span class="tag">FastAPI</span><span class="tag">PostgreSQL</span><span class="tag">React</span>
@@ -389,18 +312,43 @@ ul{list-style:none}
       </div>
     </article>
 
-    <!-- 03 Insect Classification -->
+    <!-- 02 Mīzān -->
+    <article class="project">
+      <div class="idx">02</div>
+      <div>
+        <h3>Mīzān <span class="arabic" lang="ar" dir="rtl">ميزان</span></h3>
+        <p class="role">Quranic Verse Validation System</p>
+        <p class="proj-year">2026</p>
+        <p class="desc">Deterministic normalization validates every verse; LLMs are benchmark targets.</p>
+        <ul class="bullets">
+          <li><b>6-stage Arabic normalization pipeline</b> + greedy binary-search fabrication detection against 6,236 verified verses.</li>
+          <li>Ships four surfaces: npm library, PWA web app, Chrome extension (MV3), and a FastAPI microservice.</li>
+          <li>Bundles an LLM accuracy benchmark testing GPT / Claude / Gemini on Quran prompts.</li>
+        </ul>
+        <div class="tags">
+          <span class="tag">TypeScript</span><span class="tag">Python</span><span class="tag">FastAPI</span>
+          <span class="tag">Docker</span><span class="tag">Chrome Ext MV3</span><span class="tag">PWA</span>
+        </div>
+        <div class="proj-links">
+          <a href="https://github.com/azrirefik/mizan-checker" target="_blank" rel="noopener">azrirefik/mizan-checker</a>
+          <a href="https://azri.work/mizan-checker/" target="_blank" rel="noopener" class="secondary">azri.work/mizan-checker/</a>
+        </div>
+      </div>
+    </article>
+
+    <!-- 03 Insect Species Classification -->
     <article class="project">
       <div class="idx">03</div>
       <div>
-        <h3>Insect Classification</h3>
-        <p class="role">Full Research Study, CNN architecture comparison & interpretability</p>
+        <h3>Insect Species Classification</h3>
+        <p class="role">Insect classification research study · CNN comparison & interpretability</p>
         <p class="proj-year">2025</p>
-        <p class="desc">A complete ML research study comparing three CNN architectures for 5-class insect classification. The interesting finding: a model with 4x more parameters performed worse. Transfer learning won with only 3k trainable params.</p>
+        <p class="desc">Three PyTorch approaches with custom CNNs and transfer learning.</p>
         <ul class="bullets">
-          <li>Trained <b>3 CNN architectures</b> on CIFAR-100 insects. surprising finding: deepcnn (391k params) performed worse than simplecnn (94k). resnet-18 transfer won with <b>81%</b> and only <b>~3k trainable parameters</b>.</li>
-          <li>Full <b>ablation study</b>: augmentation was worth +13%, batchnorm +9%, dropout actually hurt by 4%. augmentation matters more than model size.</li>
-          <li>Grad-CAM revealed custom CNNs looked at background color instead of the insect. transfer learning fixed that. documented in an academic paper.</li>
+          <li>Full <b>ablation study</b>: augmentation worth +13%, batch normalization +9%, dropout -4.4%.</li>
+          <li>Best test result <b>81.1%</b>.</li>
+          <li><b>Grad-CAM</b> revealed that custom CNNs relied on background color rather than insect features.</li>
+          <li>Documented in a 30-page academic paper.</li>
         </ul>
         <div class="tags">
           <span class="tag">PyTorch</span><span class="tag">torchvision</span><span class="tag">scikit-learn</span>
@@ -417,12 +365,13 @@ ul{list-style:none}
       <div class="idx">04</div>
       <div>
         <h3>PainPoint</h3>
-        <p class="role">Lovable x AWS Hackathon 2026</p>
+        <p class="role">48-hour hackathon · Lovable x AWS 2026</p>
         <p class="proj-year">2026 · Healthcare Track</p>
-        <p class="desc">A dual-dashboard pain tracking app for elderly Malaysian patients and their caregivers. malaysia has 130+ dialects, elderly patients show up to clinics speaking hokkien or cantonese but their doctors don't.</p>
+        <p class="desc">A dual-dashboard pain tracking app for elderly Malaysian patients and their caregivers.</p>
         <ul class="bullets">
-          <li>Elderly side: <b>tap-to-report body map</b> for pain location/severity, voice input in 5 languages (english, bm, mandarin, cantonese, hokkien) via web speech api + whisper fallback, medication logging. caregiver side: symptom history, appointment booking, nearby clinic map, emergency sos routing.</li>
-          <li>Stack: react 19, typescript, tanstack start, tailwind css v4, shadcn/ui, leaflet. deployed on cloudflare pages.</li>
+          <li>Dual workflows: elderly patients tap a body map to report pain and log medications; caregivers track symptom history, book appointments, and route emergency SOS.</li>
+          <li>Voice input in five languages: English, Bahasa Malaysia, Mandarin, Cantonese, and Hokkien.</li>
+          <li>Stack: React 19, TypeScript, TanStack Start, Tailwind CSS, shadcn/ui, Leaflet.</li>
         </ul>
         <div class="tags">
           <span class="tag">React 19</span><span class="tag">TypeScript</span><span class="tag">TanStack Start</span>
@@ -444,19 +393,19 @@ ul{list-style:none}
     </div>
     <dl class="skills-ledger">
       <div class="skill-row">
-        <dt>Languages</dt><span class="leader" aria-hidden="true"></span><dd>Python, TypeScript, JavaScript, SQL</dd>
+        <dt>Languages</dt><span class="leader" aria-hidden="true"></span><dd>Python, JavaScript / TypeScript, SQL</dd>
       </div>
       <div class="skill-row">
-        <dt>Backend</dt><span class="leader" aria-hidden="true"></span><dd>FastAPI, PostgreSQL, Docker, REST APIs, JWT</dd>
+        <dt>AI / ML</dt><span class="leader" aria-hidden="true"></span><dd>PyTorch, NLP, computer vision, LangGraph, RAG, LLM APIs, Azure AI</dd>
       </div>
       <div class="skill-row">
-        <dt>AI / ML</dt><span class="leader" aria-hidden="true"></span><dd>PyTorch, NLP (Arabic), Computer Vision, LangGraph, LLM APIs</dd>
+        <dt>Backend</dt><span class="leader" aria-hidden="true"></span><dd>FastAPI, PostgreSQL, SQLAlchemy, Docker, REST, JWT</dd>
       </div>
       <div class="skill-row">
         <dt>Frontend</dt><span class="leader" aria-hidden="true"></span><dd>React, Tailwind CSS</dd>
       </div>
       <div class="skill-row">
-        <dt>Tools</dt><span class="leader" aria-hidden="true"></span><dd>Git, Railway, GitHub Actions, Postman</dd>
+        <dt>Delivery / Tools</dt><span class="leader" aria-hidden="true"></span><dd>Git, Jira, pytest, Postman, GitHub Actions</dd>
       </div>
     </dl>
   </div>
